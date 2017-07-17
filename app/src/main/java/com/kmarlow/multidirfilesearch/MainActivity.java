@@ -8,6 +8,9 @@ import android.support.v7.widget.RecyclerView;
 import android.widget.EditText;
 
 import com.jakewharton.rxbinding2.widget.RxTextView;
+
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity implements MainScreen {
 
     private RecyclerView rvSearchResults;
@@ -33,7 +36,10 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
     }
 
     private void setupPresenter() {
-        presenter = new MainPresenter(this);
+        ThreadSchedulers threadSchedulers = new ThreadSchedulers();
+        DirectoryRepo directoryRepo = new DirectoryRepo(this);
+        SearchEngine searchEngine = new SearchEngine(directoryRepo, threadSchedulers);
+        presenter = new MainPresenter(this, searchEngine, threadSchedulers);
     }
 
     private void setupViewObservables() {
@@ -54,5 +60,10 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
     protected void onDestroy() {
         presenter.onDestroy();
         super.onDestroy();
+    }
+
+    @Override
+    public void updateFileList(List<FileItemViewModel> fileItemViewModels) {
+        searchResultsAdapter.updateItems(fileItemViewModels);
     }
 }
