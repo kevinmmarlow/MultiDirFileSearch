@@ -1,7 +1,10 @@
 package com.kmarlow.multidirfilesearch;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.widget.EditText;
+
+import com.jakewharton.rxbinding2.widget.RxTextView;
 public class MainActivity extends AppCompatActivity implements MainScreen {
 
     private RecyclerView rvSearchResults;
@@ -16,6 +19,7 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
         setupViews();
         setupPresenter();
+        setupViewObservables();
     }
 
     private void setupViews() {
@@ -24,7 +28,11 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
     }
 
     private void setupPresenter() {
-        presenter = new MainPresenter();
+        presenter = new MainPresenter(this);
+    }
+
+    private void setupViewObservables() {
+        presenter.onSearchTextChanges(RxTextView.afterTextChangeEvents(tvSearchInput));
     }
 
     @Override
