@@ -2,6 +2,9 @@ package com.kmarlow.multidirfilesearch;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.widget.EditText;
 
 import com.jakewharton.rxbinding2.widget.RxTextView;
@@ -11,6 +14,7 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
     private EditText tvSearchInput;
 
     private MainPresenter presenter;
+    private SearchResultsAdapter searchResultsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
         setupViews();
         setupPresenter();
         setupViewObservables();
+        setupRecyclerView();
     }
 
     private void setupViews() {
@@ -33,6 +38,16 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
 
     private void setupViewObservables() {
         presenter.onSearchTextChanges(RxTextView.afterTextChangeEvents(tvSearchInput));
+    }
+
+    private void setupRecyclerView() {
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        rvSearchResults.setItemAnimator(new DefaultItemAnimator());
+        rvSearchResults.setLayoutManager(layoutManager);
+        rvSearchResults.setHasFixedSize(true);
+
+        searchResultsAdapter = new SearchResultsAdapter(this);
+        rvSearchResults.setAdapter(searchResultsAdapter);
     }
 
     @Override
