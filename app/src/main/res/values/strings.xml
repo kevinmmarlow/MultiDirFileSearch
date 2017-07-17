@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MultiDirFileSearch</string>
+    <string name="search_hint">Enter file name</string>
 </resources>
