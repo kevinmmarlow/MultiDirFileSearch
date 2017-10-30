@@ -7,16 +7,15 @@ import com.jakewharton.rxbinding2.InitialValueObservable;
 import com.jakewharton.rxbinding2.widget.TextViewAfterTextChangeEvent;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
-import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
-import io.reactivex.functions.Predicate;
 
 /**
  The presenter layer for our main view.
@@ -45,7 +44,7 @@ public class MainPresenter {
     }
 
     public void onSearchTextChanges(InitialValueObservable<TextViewAfterTextChangeEvent> textChangeObservable) {
-        Flowable<List<File>> searchResultFilesObservable = textChangeObservable
+        Flowable<List<FileItemViewModel>> searchResultFilesObservable = textChangeObservable
                 .debounce(200, TimeUnit.MILLISECONDS)
                 .compose(new AfterTextChangeEventTransformer())
                 .distinctUntilChanged()
@@ -56,17 +55,16 @@ public class MainPresenter {
                         return searchEngine.startSearchDirectory(trimmedQuery);
                     }
                 })
-                .sample(200, TimeUnit.MILLISECONDS);
-
-        compositeDisposable.add(searchResultFilesObservable
                 .map(new Function<List<File>, List<FileItemViewModel>>() {
                     @Override
                     public List<FileItemViewModel> apply(@NonNull List<File> files) throws Exception {
                         return mapList(files);
                     }
-                })
-                .observeOn(threadSchedulers.observeOn())
-                .subscribeOn(threadSchedulers.subscribeOn())
+                });
+
+        compositeDisposable.add(searchResultFilesObservable
+                .subscribeOn(threadSchedulers.workerThread())
+                .observeOn(threadSchedulers.uiThread())
                 .subscribe(new Consumer<List<FileItemViewModel>>() {
                     @Override
                     public void accept(@NonNull List<FileItemViewModel> fileItemViewModels) throws Exception {
@@ -85,21 +83,17 @@ public class MainPresenter {
     }
 
     private List<FileItemViewModel> mapList(List<File> files) {
-        return Observable.fromIterable(files)
-                .filter(new Predicate<File>() {
-                    @Override
-                    public boolean test(@NonNull File file) throws Exception {
-                        return !file.isHidden();
-                    }
-                })
-                .map(new Function<File, FileItemViewModel>() {
-                    @Override
-                    public FileItemViewModel apply(@NonNull File file) throws Exception {
-                        return map(file);
-                    }
-                })
-                .toList()
-                .blockingGet();
+
+        List<File> modifiable = new ArrayList<>(files);
+        List<FileItemViewModel> newList = new ArrayList<>();
+
+        for (File file : modifiable) {
+            if (!file.isHidden()) {
+                newList.add(map(file));
+            }
+        }
+
+        return newList;
     }
 
     private FileItemViewModel map(File file) {

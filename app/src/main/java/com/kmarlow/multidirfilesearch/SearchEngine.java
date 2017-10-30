@@ -10,7 +10,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Queue;
+import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import io.reactivex.BackpressureStrategy;
@@ -24,8 +26,6 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import io.reactivex.subjects.PublishSubject;
-
-import static android.content.pm.PackageManager.MATCH_ALL;
 
 /**
  TODO: Add Class Header
@@ -59,7 +59,13 @@ public class SearchEngine {
                                 return searchDirectory(directory, keyword);
                             }
                         }))
-                .scan(Collections.<File>emptyList(), accumulateSortList(comparator()))
+                .scan(new ArrayList<File>(), accumulateSortList(comparator()))
+                .map(new Function<List<File>, List<File>>() {
+                    @Override
+                    public List<File> apply(@NonNull List<File> files) throws Exception {
+                        return Collections.unmodifiableList(files);
+                    }
+                })
                 .takeUntil(cancelEvents().toFlowable(BackpressureStrategy.LATEST))
                 .takeUntil(keywords.toFlowable(BackpressureStrategy.LATEST));
     }
@@ -91,7 +97,7 @@ public class SearchEngine {
         }, BackpressureStrategy.BUFFER)
                 .takeUntil(cancelEvents().toFlowable(BackpressureStrategy.LATEST))
                 .takeUntil(keywords.toFlowable(BackpressureStrategy.LATEST))
-                .subscribeOn(threadSchedulers.subscribeOn());
+                .subscribeOn(threadSchedulers.workerThread());
     }
 
     private File[] getFilesFromDirectory(File directory, final String keyword) {
@@ -100,13 +106,23 @@ public class SearchEngine {
             files = directory.listFiles();
         } else {
             try {
+
+                final Pattern pattern = Pattern.compile(String.format(Locale.getDefault(), ".*?%s.*?", keyword.toLowerCase(Locale.getDefault())));
+
                 FileFilter filter = new FileFilter() {
                     @Override
                     public boolean accept(File file) {
-                        return file.isDirectory() || file.getName().toLowerCase()
-                                .matches(MATCH_ALL + keyword.toLowerCase() + MATCH_ALL);
+
+                        String fileName = file.getName().toLowerCase(Locale.getDefault());
+                        if (file.getName().startsWith("Robo")) {
+                            Log.wtf("KEVIN", file.getName() + " matches " + keyword + " - " + Boolean.toString(pattern.matcher(
+                                    fileName).matches()));
+                        }
+
+                        return file.isDirectory() || pattern.matcher(fileName).matches();
                     }
                 };
+
                 files = directory.listFiles(filter);
             } catch (PatternSyntaxException e) {
                 files = null;
@@ -182,11 +198,9 @@ public class SearchEngine {
         return new BiFunction<List<File>, List<File>, List<File>>() {
             @Override
             public List<File> apply(@NonNull List<File> left, @NonNull List<File> right) throws Exception {
-                List<File> list = new ArrayList<>(left.size() + right.size());
-                list.addAll(left);
-                list.addAll(right);
-                Collections.sort(list, comparator);
-                return list;
+                left.addAll(right);
+                Collections.sort(left, comparator);
+                return left;
             }
         };
     }

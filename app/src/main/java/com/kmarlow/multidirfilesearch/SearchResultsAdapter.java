@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,13 +52,20 @@ public class SearchResultsAdapter extends RecyclerView.Adapter<SearchResultsAdap
 
         public ViewHolder(View itemView) {
             super(itemView);
-            tvFileName = (TextView) itemView.findViewById(android.R.id.text1);
-            tvFileSize = (TextView) itemView.findViewById(android.R.id.text2);
+            tvFileName = itemView.findViewById(android.R.id.text1);
+            tvFileSize = itemView.findViewById(android.R.id.text2);
         }
 
-        public void bindTo(FileItemViewModel viewModel) {
+        public void bindTo(final FileItemViewModel viewModel) {
             tvFileName.setText(viewModel.getName());
             tvFileSize.setText(viewModel.getSize());
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(v.getContext(), viewModel.getName(), Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 }

@@ -31,8 +31,8 @@ public class MainActivity extends AppCompatActivity implements MainScreen {
     }
 
     private void setupViews() {
-        tvSearchInput = (EditText) findViewById(R.id.search_input);
-        rvSearchResults = (RecyclerView) findViewById(android.R.id.list);
+        tvSearchInput = findViewById(R.id.search_input);
+        rvSearchResults = findViewById(android.R.id.list);
     }
 
     private void setupPresenter() {

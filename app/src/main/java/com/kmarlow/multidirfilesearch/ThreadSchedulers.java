@@ -9,11 +9,11 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class ThreadSchedulers {
 
-    public Scheduler observeOn() {
+    public Scheduler uiThread() {
         return AndroidSchedulers.mainThread();
     }
 
-    public Scheduler subscribeOn() {
+    public Scheduler workerThread() {
         return Schedulers.io();
     }
 }
