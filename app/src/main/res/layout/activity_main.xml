@@ -1,16 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.kmarlow.multidirfilesearch.MainActivity">
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              tools:context="com.kmarlow.multidirfilesearch.MainActivity">
+
+    <TextView
+        android:id="@+id/tvFound"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="4dp"
+        android:textAppearance="@android:style/TextAppearance.Material.Caption"
+        android:visibility="invisible"
+        tools:text="@string/found_x"
+        tools:visibility="visible" />
 
     <EditText
         android:id="@+id/search_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_margin="8dp"
         android:hint="@string/search_hint" />
 
 

@@ -60,11 +60,9 @@ public class SearchResultsAdapter extends RecyclerView.Adapter<SearchResultsAdap
             tvFileName.setText(viewModel.getName());
             tvFileSize.setText(viewModel.getSize());
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(v.getContext(), viewModel.getName(), Toast.LENGTH_SHORT).show();
-                }
+            itemView.setOnClickListener(v -> {
+                String path = viewModel.getFile().getAbsolutePath();
+                Toast.makeText(v.getContext(), path, Toast.LENGTH_SHORT).show();
             });
         }
     }

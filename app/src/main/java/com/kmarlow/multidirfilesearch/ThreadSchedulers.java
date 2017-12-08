@@ -13,7 +13,11 @@ public class ThreadSchedulers {
         return AndroidSchedulers.mainThread();
     }
 
-    public Scheduler workerThread() {
+    public Scheduler ioThread() {
         return Schedulers.io();
+    }
+
+    public Scheduler computationThread() {
+        return Schedulers.computation();
     }
 }

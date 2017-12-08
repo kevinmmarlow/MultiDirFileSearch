@@ -7,4 +7,6 @@ import java.util.List;
  */
 public interface MainScreen {
     void updateFileList(List<FileItemViewModel> fileItemViewModels);
+
+    void requestPermissions(String[] strings, int requestCode);
 }

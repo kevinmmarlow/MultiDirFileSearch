@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">MultiDirFileSearch</string>
     <string name="search_hint">Enter file name</string>
+    <string name="found_x">Found %d items.</string>
 </resources>

@@ -9,8 +9,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import timber.log.Timber;
+
 /**
- TODO: Add Class Header
+ Abstraction for determining available file directories.
+
+ Note that on some devices, the root and home directory are the same.
  */
 public class DirectoryRepo {
 
@@ -30,6 +34,8 @@ public class DirectoryRepo {
         if (fileDirectories != null) {
             directories.addAll(Arrays.asList(fileDirectories));
         }
+
+        Timber.d("Searching across %s", directories);
         return directories;
     }
 
